@@ -1,0 +1,18 @@
+#pragma once
+#include "Campaign.h"
+#include "CampaignEditor.h"
+
+#include "characterObserver.h"
+#include "Enhancement.h"
+#include "Item.h"
+#include "ItemContainer.h"
+#include "Map.h"
+#include "MapEditor.h"
+#include "MapObserver.h"
+#include "ConcreteMap.h"
+#include "Fighter.h"
+#include "BullyFighterBuilder.h"
+#include "CharacterBuilder.h"
+#include "NimbleFighterBuilder.h"
+#include "TankFighterBuilder.h"
+#include "Character.h"
