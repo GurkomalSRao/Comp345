@@ -8,6 +8,8 @@ using namespace std;
 //Created by: Justin Velicogna
 //Student ID: 40005294
 
+enum Direction;
+class ConcreteMap;
 
 //! A strategy for friendly monsters
 class FriendlyStrategy : public SpriteStrategy {
@@ -23,7 +25,7 @@ public:
 	//! @param avatar: the player character
 	//! @param monsters: a list of monsters
 	//! @param function: the function to be performed to update the map
-	void execute(int speed, int attacks, CharacterSprite* me, CharacterSprite* avatar, vector<CharacterSprite>* monsters, void(*function)(CharacterSprite*, vector<CharacterSprite>*)) {
+	void execute(int speed, int attacks, CharacterSprite* me, CharacterSprite* avatar, vector<CharacterSprite*>* monsters, ConcreteMap* m) {
 		for (int i = 0; i < speed; i++)
 		{
 			if ((abs(me->pos.x - avatar->pos.x) == 1 && abs(me->pos.y - avatar->pos.y) == 0) || (abs(me->pos.x - avatar->pos.x) == 0 && abs(me->pos.y - avatar->pos.y) == 1))
@@ -31,19 +33,20 @@ public:
 			if (abs(me->pos.x - avatar->pos.x)  > abs(me->pos.y - avatar->pos.y))
 			{
 				if (abs(me->pos.x > avatar->pos.x))
-					me->pos.x--;
+					m->moveCharacter(Direction::up, me);
 				else
-					me->pos.x++;
+					m->moveCharacter(Direction::down, me);
 			}
 			else{
 				if (abs(me->pos.y > avatar->pos.y))
-					me->pos.y--;
+					m->moveCharacter(Direction::left, me);
 				else
-					me->pos.y++;
+					m->moveCharacter(Direction::right, me);
 			}
-			system("cls");
-			function(avatar, monsters);
 			system("pause");
+			
+
+			
 		}
 		random_device rd;
 		mt19937 gen(rd());  
@@ -64,7 +67,7 @@ public:
 			cout << "The monster asks you if you have a significant other. You hastily explain to the monster that you're married to your job as an adventurer." << endl;
 			break;
 		}
-
+		system("pause");
 
 
 

@@ -15,12 +15,14 @@ public:
 	int y = 0;
 
 };
-
+enum Direction;
 //! Character implementing a character sprite
 class CharacterSprite{
 	private:
 		SpriteStrategy* s;
 	public:
+		
+
 		AbstractCharacter* c;
 		CharacterSprite();
 		Coordinates pos;
@@ -35,9 +37,9 @@ class CharacterSprite{
 		//! @param avatar: the player's character
 		//! @param dudes: the list of monsters
 		//! @param function: the function to update the map
-		void executeStrategy(CharacterSprite* avatar, vector<CharacterSprite>* dudes, void(*function)(CharacterSprite*, vector<CharacterSprite>*)) {
+		void executeStrategy(CharacterSprite* avatar, vector<CharacterSprite*>* dudes, ConcreteMap* m) {
 		
-			this->s->execute(4,2,this,avatar,dudes,function);
+			this->s->execute(4,2,this,avatar, dudes, m);
 
 		}
 };

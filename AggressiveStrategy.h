@@ -3,11 +3,15 @@
 #include <iostream>
 #include "SpriteStrategy.h"
 #include <random>
+#include "ConcreteMap.h"
+
 using namespace std;
 //COMP 345 Assignment 3
 //Created by: Justin Velicogna
 //Student ID: 40005294
 
+
+//enum Direction{ up, down, left, right };
 
 //! Implementation of a strategy for aggressive monsters
 class AggressiveStrategy : public SpriteStrategy {
@@ -23,7 +27,7 @@ public:
 	//! @param avatar: the player character
 	//! @param monsters: a list of monsters
 	//! @param function: the function to be performed to update the map
-	void execute(int speed, int attacks, CharacterSprite* me, CharacterSprite* avatar, vector<CharacterSprite>* monsters, void(*function)(CharacterSprite*, vector<CharacterSprite>*)) {
+	void execute(int speed, int attacks, CharacterSprite* me, CharacterSprite* avatar, vector<CharacterSprite*>* monsters,ConcreteMap* m) {
 		for (int i = 0; i < speed; i++)
 		{
 			if ((abs(me->pos.x - avatar->pos.x) == 1 && abs(me->pos.y - avatar->pos.y) == 0) || (abs(me->pos.x - avatar->pos.x) == 0 && abs(me->pos.y - avatar->pos.y) == 1))
@@ -31,18 +35,16 @@ public:
 			if (abs(me->pos.x - avatar->pos.x)  > abs(me->pos.y - avatar->pos.y))
 			{
 				if (abs(me->pos.x > avatar->pos.x))
-					me->pos.x--;
+					m->moveCharacter(Direction::up, me);
 				else
-					me->pos.x++;
+					m->moveCharacter(Direction::down, me);
 			}
 			else{
 				if (abs(me->pos.y > avatar->pos.y))
-					me->pos.y--;
+					m->moveCharacter(Direction::left, me);
 				else
-					me->pos.y++;
+					m->moveCharacter(Direction::right, me);
 			}
-			system("cls");
-			function(avatar, monsters);
 			system("pause");
 		}
 		for (int i = 0; i < attacks; i++)
@@ -53,6 +55,7 @@ public:
 				cout << "The monster konks you in the head" << endl;
 			}
 		}
+		
 		random_device rd;
 		mt19937 gen(rd());  
 		uniform_int_distribution<> dis(0, 7);  
@@ -72,8 +75,9 @@ public:
 				cout << "The monster makes a yo mama joke. It's not a very good yo mama joke though." << endl;
 				break;
 		}
+		system("pause");
 
-
+		
 
 
 

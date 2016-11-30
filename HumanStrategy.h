@@ -4,10 +4,14 @@
 //Created by: Justin Velicogna
 //Student ID: 40005294
 
+enum Direction;
+
+
 #include <vector>
 #include<iostream>
 #include <string>
 #include "SpriteStrategy.h"
+#include "ConcreteMap.h"//for the direction enum
 #include "CharacterSprite.h"
 using namespace std;
 
@@ -25,7 +29,7 @@ public:
 	//! @param avatar: the player character
 	//! @param monsters: a list of monsters
 	//! @param function: the function to be performed to update the map
-	void execute(int speed, int attacks, CharacterSprite* me, CharacterSprite* avatar, vector<CharacterSprite>* monsters, void(*function)(CharacterSprite*, vector<CharacterSprite>*)) {
+	void execute(int speed, int attacks, CharacterSprite* me, CharacterSprite* avatar, vector<CharacterSprite*>* monsters, ConcreteMap* m) {
 		cout << "Move using WASD, or press F to stop moving";
 		for (int i = 0; i < speed; i++)
 		{
@@ -35,16 +39,20 @@ public:
 			switch (c)
 			{
 			case 'W':
-				me->pos.x--;
+				if (!(m->moveCharacter(Direction::up, me)))
+					i--;
 				break;
 			case 'S':
-				me->pos.x++;
+				if (!(m->moveCharacter(Direction::down, me)))
+					i--;
 				break;
 			case 'A':
-				me->pos.y--;
+				if (!(m->moveCharacter(Direction::left, me)))
+					i--;
 				break;
 			case 'D':
-				me->pos.y++;
+				if (!(m->moveCharacter(Direction::right, me)))
+					i--;
 				break;
 			case 'F':
 				i = speed;
@@ -55,8 +63,8 @@ public:
 				break;
 
 			}
-			system("cls");
-			function(avatar, monsters);
+			
+			//function(avatar, monsters);
 		}
 		cout << "Press WASD to attack in that direction! Or press F to stop attacking.";
 		for (int i = 0; i < attacks; i++)
@@ -96,9 +104,9 @@ public:
 			if (!dontattack){
 				for (int j = 0; j < monsters->size();j++)
 				{
-					if ((monsters->at(j).pos.x == toatk.x && monsters->at(j).pos.y == toatk.y))
+					if ((monsters->at(j)->pos.x == toatk.x && monsters->at(j)->pos.y == toatk.y))
 					{
-						me->attack(&monsters->at(j));
+						me->attack(monsters->at(j));
 						cout << "You give the monster a knuckle sandwich!" << endl;
 					}
 				}
