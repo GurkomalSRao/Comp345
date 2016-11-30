@@ -136,7 +136,13 @@ void gameEngine::startMenu(){//TODO:  improve menu loop
 }
 
 void gameEngine::moveCharacter(){
-	char ch;
+	
+	myMap->getAvatar()->executeStrategy(myMap->getAvatar(),myMap->getMonsters(),myMap);
+	for (int i = 0; i < myMap->getMonsters()->size(); i++)
+	{
+		myMap->getMonsters()->at(i)->executeStrategy(myMap->getAvatar(), myMap->getMonsters(), myMap);
+	}
+	/*char ch;
 	int coord_x, coord_y = 0;
 	cout << "Use WASD keys to move character, E to equip Items from inventory, C to view Information, X to exit program ( " << AVATAR_TILE << " is the character symbol )." << endl;
 	do{
@@ -171,7 +177,7 @@ void gameEngine::moveCharacter(){
 				cout << "Invalid input, try Again" << endl;
 		}
 	}while (ch != 'W' && ch != 'A' &&ch != 'S' &&ch != 'D' &&ch != 'X' &&ch != 'E');
-	
+	*/
 }
 
 void gameEngine::playGame(){
