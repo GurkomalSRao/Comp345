@@ -43,7 +43,7 @@ Character::Character()  //generated random ability scores and class set to fight
 	/*for (int i = 0; i < 7; i++){
 		equipment[i] = noItem;
 	}*/
-	
+	attacks = new int(1);
 	currentHitPoints = 10 + abilityModifier(2);
 	characterClass = "fighter";
 	baseBonusAtk = abilityModifier(0) + abilityModifier(1);
@@ -155,6 +155,7 @@ int* Character::attackBonus()
 	{
 		length++;
 		attacks = new int(length);
+		totalDamagePerRound = new int(length);
 	}
 
 	for (size_t i = 0; i < length - 1; i++)
@@ -165,6 +166,7 @@ int* Character::attackBonus()
 			bonusPerRound -= 5;
 		}
 	}
+
 	return attacks;
 }
 
@@ -222,6 +224,11 @@ int Character::GetAttack(int attack)
 	return totalDamagePerRound[attack];
 }
 
+int Character::getBonusAtks(int batkIndex)
+{
+	return *(attacks + batkIndex);
+}
+
 bool Character::equipItem(string type){  //equip item for character
 	
 	backpack.removeItem(type);
@@ -234,160 +241,7 @@ bool Character::unequipItem( Item *item){
 	return true;
 }
 
-/*
-//! Implementation saveCharacter, saves character as binary to a file
-//! @param Character: the character to be saved
-void Character::saveCharacter(){
-	vector<Item*> equipment;
-	equipment = getEquipment();
-	string fileName;
-	cout << "File Name: ";
-	cin >> fileName;
 
-	ofstream output(fileName);
-	output << "Character.sav" << endl;	//define type of save file
-	output << level << endl;
-	output << currentHitPoints << endl;
-	for (int i = 0; i < 6; i++)
-		output << abilityScores[i] << endl;
-	output << equipment.size();
-	for (int i = 0; i < equipment.size(); i++)
-	{
-		output << equipment[i]->getType() << endl;
-		output << equipment[i]->getInfluences().size() << endl;
-		getItem("Helmet");
-		for (int j = 0; j < equipment[i]->getInfluences().size(); j++)
-		{
-			output << equipment[i]->getInfluences().at(j).getType() << endl;
-			output << equipment[i]->getInfluences().at(j).getBonus() << endl;
-		}
-	}
-
-	if (backpack.getSize() != 0){  //save the backpack
-		output << backpack.getSize() << endl;
-		for (int i = 0; i < backpack.getSize(); i++)
-		{
-			output << backpack.getItems().at(i)->getType() << endl;
-			output << backpack.getItems()[i]->getInfluences().size() << endl;
-			for (int j = 0; j < backpack.getItems()[i]->getInfluences().size(); j++)
-			{
-				output << backpack.getItems()[i]->getInfluences().at(j).getType() << endl;
-				output << backpack.getItems()[i]->getInfluences().at(j).getBonus() << endl;
-			}
-		}
-	}
-	else
-		output << -1;
-	output.close();
-}
-//! Implementation loadCharacter, load a Character from a file
-//! assumption: file exists and is a Character
-//! @param &item: the character to be loaded
-void Character::loadCharacter(){
-	//vector<Item*> equipment;
-	//equipment = getEquipment();
-	string fileName;
-	string fileValidation;
-	string type;
-	Enhancement *tempEnhance;
-	bool badFile = false;
-	int influenceSize;
-	int loopValidation;
-	int bonus;
-	cout << "Load File: ";
-	cin >> fileName;
-
-	ifstream input(fileName);
-	do{
-		while (!input.good()){
-			cout << "File does not exist, try again: ";
-			cin >> fileName;
-			input.open(fileName);
-		}
-		input >> fileValidation;
-		if (fileValidation == "Character.sav")//check if it is an item save file
-			badFile = true;
-		else{
-			input.close();
-			badFile = false;
-			cout << "Incorrect File Loaded, select another File: " << endl;
-			cin >> fileName;
-			input.open(fileName);
-		}
-	} while (badFile == false);		//check if loading character file type
-	
-	input >> level;
-	input >> currentHitPoints;
-	for (int i = 0; i < 6; i++){
-		input >> abilityScores[i];
-	}
-	input >> loopValidation;
-	Item* tempItem;
-	for (int i = 0; i < loopValidation; i++)			//save equipped items
-	{
-		input >> type;
-		if (type == "Helmet"){
-			tempItem = new Item();
-			myCharacter = new Belt(myCharacter, myCharacter->getBackPack().getItem("Belt"));
-		}
-		else if (type == "Armor"){
-
-		}
-		else if (type == "Shield"){
-
-		}
-		else if (type == "Ring"){
-
-		}
-		else if (type == "Belt"){
-
-		}
-		else if (type == "Boots"){
-
-		}
-		else if (type == "Weapon"){
-
-		}
-		
-		
-		equipment[i].setType(type);
-		input >> influenceSize;
-		for (int j = 0; j < influenceSize; j++)
-		{
-			input >> type;
-			input >> bonus;
-			tempEnhance = new Enhancement(type, bonus);
-			equipment[i].setInfluences(*tempEnhance); //HARAMBEEEEEEEEE
-			delete tempEnhance;
-		}
-	}
-
-
-	input >> loopValidation;
-	if (loopValidation != -1){
-		Item *tempItem;
-		string typeEnhance;
-		for (int i = 0; i < loopValidation; i++)		//save inventory/backpack
-		{
-			input >> type;
-			tempItem = new Item();
-			tempItem->setType(type);
-			input >> influenceSize;
-			for (int j = 0; j < influenceSize; j++)
-			{
-				input >> typeEnhance;
-				input >> bonus;
-				tempEnhance = new Enhancement(typeEnhance, bonus);
-				tempItem->setInfluences(*tempEnhance);
-				backpack.addItem(tempItem);
-				delete tempEnhance;
-				delete tempItem;
-			}
-		}
-	}
-	input.close();
-}
-*/
 void Character::monsterClass()
 {
 	characterClass = "monster";
@@ -398,38 +252,7 @@ void Character::addItemToInventory(Item* newItem){
 }
 
 bool Character::displayEquipedItems(string s){  //view of the items equiped by the character
-	/*string type;
-	for (int i = 0; i < ITEM_SLOTS; i++){
-		type = equipment[i].getType();
-		cout << "| ";
-		if (type != "Nothing")
-			equipment[i].print();
-		else{
-			switch (i){
-			case Helmet:
-				cout << "No Helmet equipped" << endl;
-				break;
-			case Armor:
-				cout << "No Armor equipped" << endl;
-				break;
-			case OffHand:
-				cout << "No Off Hand equipped" << endl;
-				break;
-			case Ring:
-				cout << "No Ring equipped" << endl;
-				break;
-			case Belt:
-				cout << "No Belt equipped" << endl;
-				break;
-			case Boots:
-				cout << "No Boots equiped" << endl;
-				break;
-			case MainHand:
-				cout << "No Weapon equiped" << endl;
-				break;
-			}
-		}
-	}*/
+
 	return true;
 }
 
@@ -500,9 +323,13 @@ void Character::setAbilityScores(string classType)  //sets the abilityscores acc
 		abilityScores[4] = abilites[0];
 		fighterType = "Tank";
 	}
-	//set your inital bonus atk
+	//set your inital base bonus atk
 	baseBonusAtk = abilityModifier(0) + abilityModifier(1);
 	level = 1;
+}
+
+void Character::initializeBonusAttack(){
+	baseBonusAtk = abilityModifier(0) + abilityModifier(1);
 }
 
 void Character::setAbilityScore(int index, int value){

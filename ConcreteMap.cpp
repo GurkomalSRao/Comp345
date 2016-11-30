@@ -188,7 +188,10 @@ ConcreteMap::ConcreteMap(Map* ma, AbstractCharacter* myAvatar){
 	avatar.pos.x = x;
 	avatar.pos.y = y;
 	m->copyMap(*ma);
-	level = myAvatar->getLevel();
+	if (myAvatar->getLevel() >= 5)		//item level cannot be beyond +5
+		level = 5;
+	else 
+		level = myAvatar->getLevel();
 	
 }
 

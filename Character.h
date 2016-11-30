@@ -56,6 +56,8 @@ public:
 	int getBaseBonus();
 	void setArmor();
 	void setBonusDamage();
+	void initializeBonusAttack();
+	int getBonusAtks(int);
 private: 
 	string characterClass;
 	ItemContainer backpack;
@@ -64,7 +66,7 @@ private:
 	int abilityScores[6];
 	int currentHitPoints;
 	int level;
-	int* attacks = new int(1);
+	int* attacks;
 	int* totalDamagePerRound = new int(1);
 	int length;
 	int baseBonusAtk;

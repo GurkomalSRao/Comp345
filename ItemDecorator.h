@@ -117,27 +117,33 @@ public:
 		return c->getBaseBonus();
 	}
 
-	virtual int getAttacksSize()
+	 int getAttacksSize()
 	{
 		return c->getAttacksSize();
 	}
 
-	virtual void SetAttack()
+	 void SetAttack()
 	{
 		return c->SetAttack();
 	}
 
-	virtual int GetAttack(int attack)
+	 int GetAttack(int attack)
 	{
 		return c->GetAttack(attack);
 	}
-	virtual void setArmor()
+	 void setArmor()
 	{
 		return c->setArmor();
 	}
-	virtual void setBonusDamage()
+	 void setBonusDamage()
 	{
 		return c->setBonusDamage();
 	}
+	 int getBonusAtks(int i){
+		return c->getBonusAtks(i);
+	 }
+	 void initializeBonusAttack(){
+		 c->initializeBonusAttack();
+	 }
 };
 

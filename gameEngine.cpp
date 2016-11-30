@@ -191,8 +191,6 @@ void gameEngine::playGame(){
 			//Place treasure in inventory
 			myCharacter->addItemToInventory(myMap->getTreasure(myMap->getAvatar().pos));
 			myMap->removeTreasure(myMap->getAvatar().pos);
-
-
 		}
 		if (myMap->getAvatarTile() == END_TILE){
 			//end the game
@@ -474,6 +472,8 @@ void gameEngine::saveCharacter(){
 	output << myCharacter->getHitPoints() << endl;
 	for (int i = 0; i < 6; i++)
 		output << myCharacter->getAbilityScore(i) << endl;
+	//for (int i = 0; )
+	//output << myCharacter->armor();
 	output << equipment.size() << endl;
 	for (int i = 0; i < equipment.size(); i++)
 	{
@@ -508,9 +508,7 @@ void gameEngine::saveCharacter(){
 //! assumption: file exists and is a Character
 //! @param &item: the character to be loaded
 void gameEngine::loadCharacter(){
-	//vector<Item*> equipment;
-	//equipment = getEquipment();
-	//AbstractCharacter *myCharacter;
+	
 	string fileName;
 	string fileValidation;
 	string type;
@@ -548,13 +546,18 @@ void gameEngine::loadCharacter(){
 	input >> type;
 	myCharacter->setFighterType(type);
 	input >> level;
-	myCharacter->setLevel(level);
+	for (size_t i = 0; i <= level; i++){	//needed dont remove
+		myCharacter->setLevel(i);
+	}
+
 	input >> hp;
 	myCharacter->setHitPoints(hp);
 	for (int i = 0; i < 6; i++){
 		input >> abilityScore;
 		myCharacter->setAbilityScore(i, abilityScore);
 	}
+	myCharacter->SetAttack();
+
 	input >> loopValidation;
 	string itemType;
 	string type2;

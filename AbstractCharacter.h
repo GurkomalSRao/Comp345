@@ -53,8 +53,10 @@ public:
 	virtual int getAttacksSize() = 0;
 	virtual void SetAttack() = 0;
 	virtual int GetAttack(int) = 0;
-	virtual void setArmor();
-	virtual void setBonusDamage();
+	virtual void setArmor() = 0;
+	virtual void setBonusDamage() = 0;
+	virtual int getBonusAtks(int) = 0;
+	virtual void initializeBonusAttack() = 0;
 	/*int damageBonus();
 	bool equipItem(Item);
 	bool unequipItem(string);
