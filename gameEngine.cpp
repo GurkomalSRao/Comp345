@@ -183,20 +183,20 @@ void gameEngine::moveCharacter(){
 void gameEngine::playGame(){
 	
 	while (true){
-		myMap->getAvatar().c->display();
+		myMap->getAvatar()->c->display();
 		myMap->NotifyMap();
 		printEquipmentInterface();
 		if (myMap->getAvatarTile() == MONSTER_TILE)
 		{
 			cout << "You found a monster! Monster stats: " << endl;
-			myMap->getMonster(myMap->getAvatar().pos)->display();
+			myMap->getMonster(myMap->getAvatar()->pos)->display();
 		}
 		if (myMap->getAvatarTile() == TREASURE_TILE)
 		{
 			cout << "You got a treasure! Please check your inventory." << endl;
 			//Place treasure in inventory
-			myCharacter->addItemToInventory(myMap->getTreasure(myMap->getAvatar().pos));
-			myMap->removeTreasure(myMap->getAvatar().pos);
+			myCharacter->addItemToInventory(myMap->getTreasure(myMap->getAvatar()->pos));
+			myMap->removeTreasure(myMap->getAvatar()->pos);
 		}
 		if (myMap->getAvatarTile() == END_TILE){
 			//end the game
