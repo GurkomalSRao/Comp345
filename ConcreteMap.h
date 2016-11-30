@@ -27,8 +27,8 @@ class ConcreteMap : public Subject
 	private:
 		Map* m;
 		int level;
-		CharacterSprite avatar;
-		vector<CharacterSprite> monsters;
+		CharacterSprite* avatar;
+		vector<CharacterSprite*>* monsters;
 		vector<TreasureSprite> treasures;
 
 
@@ -43,13 +43,14 @@ class ConcreteMap : public Subject
 		void initMap();//calls fillTreasure and fillMonster, sets avatar's position to start
 		void printMap(); 
 		void printFullMap();
-		CharacterSprite getAvatar(); 
-		vector<CharacterSprite> getMonsters();
+		CharacterSprite* getAvatar(); 
+		vector<CharacterSprite*>* getMonsters();
 		void displayMonsterInfo();
 		void displayChestInfo();
 		vector<TreasureSprite> getTreasures();
 		Map getMap();//returns a map, no characters will be displayed
 		Map getFullMap();//Characters will be displayed
+		bool moveCharacter(Direction d, CharacterSprite* ch);
 		bool moveAvatar(Direction d);
 		bool moveMonster(Direction d, int index);//WILL NOT BE USED, MONSTERS DO NOT MOVE
 		char getAvatarTile();//returns the tile underneath the avatar, including treasure or monsters if nececerry

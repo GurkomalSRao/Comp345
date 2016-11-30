@@ -131,23 +131,25 @@ void ConcreteMap::fillMonster(){
 		{
 			if (m->getCell(i, j) == m->MONSTER_TILE)
 			{
-				Character* monster = new Character();
+				
+				AbstractCharacter* monster = new Character();
 				monster->setLevel(level);
 				monster->monsterClass();
-				CharacterSprite mmonster;
-				mmonster.c = monster;
-				mmonster.pos.x = i;
-				mmonster.pos.y = j;
+				CharacterSprite* mmonster = new CharacterSprite();
+				mmonster->c = monster;
+				mmonster->pos.x = i;
+				mmonster->pos.y = j;
 				random_device rd;
 				mt19937 gen(rd());  //initializes the generater
 				uniform_int_distribution<> dis(0, 1);  //generates a range from 0 to 6
 				enum itemTypes { Helmet, Armor, Weapon, Shield, Ring, Belt, Boots };
 				int randomItem = dis(gen);
 				if (randomItem == 0)
-					mmonster.setStrategy(new AggressiveStrategy());
+					mmonster->setStrategy(new AggressiveStrategy());
 				else
-					mmonster.setStrategy(new FriendlyStrategy());
-				monsters.push_back(mmonster);
+					mmonster->setStrategy(new FriendlyStrategy());
+				monsters->push_back(mmonster);
+				m->fillCell(i, j,m->BLANK_TILE);
 			}
 			
 		}
@@ -168,30 +170,28 @@ Map* ConcreteMap::generateFullMap(){
 	{
 		mymap->fillCell(treasures[i].pos.x, treasures[i].pos.y, m->TREASURE_TILE);
 	}
-	for (int i = 0; i < monsters.size(); i++)
+	for (int i = 0; i < monsters->size(); i++)
 	{
-		mymap->fillCell(monsters[i].pos.x, monsters[i].pos.y, m->MONSTER_TILE);
+		mymap->fillCell(monsters->at(i)->pos.x, monsters->at(i)->pos.y, m->MONSTER_TILE);
 	}
 
-	mymap->fillCell(avatar.pos.x, avatar.pos.y, m->AVATAR_TILE);
+	mymap->fillCell(avatar->pos.x, avatar->pos.y, m->AVATAR_TILE);
 
 	return mymap;
 }
 ConcreteMap::ConcreteMap(Map* ma, AbstractCharacter* myAvatar){
 	m = new Map();
-	avatar;
-	avatar.c = myAvatar;
-	avatar.setStrategy(new HumanStrategy());
+	monsters = new vector<CharacterSprite*>();
+	avatar = new CharacterSprite();
+	avatar->c = myAvatar;
+	avatar->setStrategy(new HumanStrategy());
 	int x;
 	int y;
 	ma->findTile(ma->START_TILE,x,y);
-	avatar.pos.x = x;
-	avatar.pos.y = y;
+	avatar->pos.x = x;
+	avatar->pos.y = y;
 	m->copyMap(*ma);
-	if (myAvatar->getLevel() >= 5)		//item level cannot be beyond +5
-		level = 5;
-	else 
-		level = myAvatar->getLevel();
+	level = myAvatar->getLevel();
 	
 }
 
@@ -240,13 +240,13 @@ void ConcreteMap::printFullMap(){
 
 //! Implementation getter for the avatar
 //! @return : returns the character avatar
-CharacterSprite ConcreteMap::getAvatar(){
+CharacterSprite* ConcreteMap::getAvatar(){
 	return avatar;
 }
 //! Implementation getter for the monsters
 //! @return : a vector list of monsters
 
-vector<CharacterSprite> ConcreteMap::getMonsters(){
+vector<CharacterSprite*>* ConcreteMap::getMonsters(){
 	return monsters;
 }
 
@@ -261,18 +261,13 @@ vector<TreasureSprite> ConcreteMap::getTreasures(){
 Map ConcreteMap::getMap(){
 	return *m;
 }
-
-//! Implementation Moves the avatar in a specified direction
-//! @param d: the direction to move
-//! @return : wheather the avatar moved successfully
-bool ConcreteMap::moveAvatar(Direction d){
+bool ConcreteMap::moveCharacter(Direction d, CharacterSprite* s){
 	switch (d)
 	{
-
-	case up:
-		if (canWalk(avatar.pos.x - 1, avatar.pos.y))
+		case up:
+			if (canWalk(s->pos.x - 1, s->pos.y))
 		{
-			avatar.pos.x--;
+				s->pos.x--;
 			Notify();
 			return true;
 		}
@@ -281,9 +276,9 @@ bool ConcreteMap::moveAvatar(Direction d){
 		}
 		break;
 	case down:
-		if (canWalk(avatar.pos.x + 1, avatar.pos.y))
+		if (canWalk(s->pos.x + 1, s->pos.y))
 		{
-			avatar.pos.x++;
+			s->pos.x++;
 			Notify();
 			return true;
 		}
@@ -292,9 +287,9 @@ bool ConcreteMap::moveAvatar(Direction d){
 		}
 		break;
 	case Direction::left:
-		if (canWalk(avatar.pos.x, avatar.pos.y - 1))
+		if (canWalk(s->pos.x, s->pos.y - 1))
 		{
-			avatar.pos.y--;
+			s->pos.y--;
 			Notify();
 			return true;
 		}
@@ -303,9 +298,62 @@ bool ConcreteMap::moveAvatar(Direction d){
 		}
 		break;
 	case Direction::right:
-		if (canWalk(avatar.pos.x, avatar.pos.y + 1))
+		if (canWalk(s->pos.x, s->pos.y + 1))
 		{
-			avatar.pos.y++;
+			s->pos.y++;
+			Notify();
+			return true;
+		}
+		else{
+			return false;
+		}
+		break;
+	}
+}
+//! Implementation Moves the avatar in a specified direction
+//! @param d: the direction to move
+//! @return : wheather the avatar moved successfully
+bool ConcreteMap::moveAvatar(Direction d){
+	switch (d)
+	{
+
+	case up:
+		if (canWalk(avatar->pos.x - 1, avatar->pos.y))
+		{
+			avatar->pos.x--;
+			Notify();
+			return true;
+		}
+		else{
+			return false;
+		}
+		break;
+	case down:
+		if (canWalk(avatar->pos.x + 1, avatar->pos.y))
+		{
+			avatar->pos.x++;
+			Notify();
+			return true;
+		}
+		else{
+			return false;
+		}
+		break;
+	case Direction::left:
+		if (canWalk(avatar->pos.x, avatar->pos.y - 1))
+		{
+			avatar->pos.y--;
+			Notify();
+			return true;
+		}
+		else{
+			return false;
+		}
+		break;
+	case Direction::right:
+		if (canWalk(avatar->pos.x, avatar->pos.y + 1))
+		{
+			avatar->pos.y++;
 			Notify();
 			return true;
 		}
@@ -324,16 +372,16 @@ void ConcreteMap::NotifyMap(){
 //! Implementation finds the tile underneath the avatar
 //! @return : the tile under the avatar, possibly a monster or treasure
 char ConcreteMap::getAvatarTile(){
-	return getCell(avatar.pos.x, avatar.pos.y);
+	return getCell(avatar->pos.x, avatar->pos.y);
 }
 
 //! Implementation gets the cell at a specific position, possibly a monster or treasure, but not the avatar
 //! @return : the tile
 char ConcreteMap::getCell(int x, int y){
 	
-	for (int i = 0; i < monsters.size(); i++)
+	for (int i = 0; i < monsters->size(); i++)
 	{
-		if (monsters[i].pos.x == x && monsters[i].pos.y == y)
+		if (monsters->at(i)->pos.x == x && monsters->at(i)->pos.y == y)
 			return m->MONSTER_TILE;
 	}
 	for (int i = 0; i < treasures.size(); i++)
@@ -360,10 +408,11 @@ bool ConcreteMap::isOccupied(int x, int y){
 //! @param y: y coordinate of the tile
 //! @return : wheather or not the tile can be walked on
 bool ConcreteMap::canWalk(int x, int y){
-	if (m->canWalk(x, y))
-		return true;
+	char c = getCell(x, y);
+	if (c == m->MONSTER_TILE || c == m->WALL_TILE)
+		return false;
 
-	return false;
+	return true;
 }
 
 //! Implementation finds a tile of specified type, includes monster, treasure, or avatar tiles
@@ -374,16 +423,16 @@ bool ConcreteMap::canWalk(int x, int y){
 bool ConcreteMap::findTile(char find, int& x, int& y){
 	if (find == m->AVATAR_TILE)
 	{
-		x = avatar.pos.x;
-		y = avatar.pos.y;
+		x = avatar->pos.x;
+		y = avatar->pos.y;
 		return true;
 	}
 	if (find == m->MONSTER_TILE)
 	{
-		if (monsters.empty())
+		if (monsters->empty())
 			return false;
-		x = monsters[0].pos.x;
-		y = monsters[0].pos.y;
+		x = monsters->at(0)->pos.x;
+		y = monsters->at(0)->pos.y;
 		return true;
 	}
 	if (find == m->TREASURE_TILE)
@@ -421,7 +470,7 @@ bool ConcreteMap::removeTreasure(Coordinates p){
 //! @param i: index of the monster
 //! @return : the monster
 AbstractCharacter* ConcreteMap::getMonster(int i){
-	return monsters[i].c;
+	return monsters->at(i)->c;
 }
 
 //! Implementation gets a treasure at a specific index
@@ -435,10 +484,10 @@ Item* ConcreteMap::getTreasure(int i){
 //! @param p: coordinates of the monster
 //! @return : the monster
 AbstractCharacter* ConcreteMap::getMonster(Coordinates p){
-	for (int i = 0; i < monsters.size(); i++)
+	for (int i = 0; i < monsters->size(); i++)
 	{
-		if (monsters[i].pos.x == p.x && monsters[i].pos.y == p.y)
-			return monsters[i].c;
+		if (monsters->at(i)->pos.x == p.x && monsters->at(i)->pos.y == p.y)
+			return monsters->at(i)->c;
 	}
 	return NULL;
 }
@@ -456,12 +505,12 @@ Item* ConcreteMap::getTreasure(Coordinates p){
 //! Implementation displays info on all monsters in the room
 void ConcreteMap::displayMonsterInfo()
 {
-	for (size_t i = 0; i < monsters.size(); i++)
+	for (size_t i = 0; i < monsters->size(); i++)
 	{
 		cout << "Monster" << i+1 << endl;
-		monsters[i].c->display();
+		monsters->at(i)->c->display();
 	}
-	if (monsters.size() == 0)
+	if (monsters->size() == 0)
 	{
 		cout << "No monsters in the room" << endl;
 	}
