@@ -139,7 +139,13 @@ void Character::setLevel(int lvl)  //updates/sets the level of the character inc
 
 int Character::armor()
 {
-	return 10 + abilityModifier(1);
+	armorClass = 10 + abilityModifier(1);
+	return armorClass;
+}
+
+void Character::setArmor()
+{
+	armorClass = 10 + abilityModifier(1);
 }
 
 int* Character::attackBonus()
@@ -167,6 +173,11 @@ int Character::damageBonus()
 	return abilityModifier(0); 
 }
 
+void Character::setBonusDamage()
+{
+	bonusDamage = abilityModifier(0);
+}
+
 void Character::display() //displays the view of the character interface
 {
 	cout << "Class: " << characterClass << " Level: " << level << " HP: " << currentHitPoints << " AC: " << armor() << " Bonus Atk: ";
@@ -183,6 +194,32 @@ void Character::display() //displays the view of the character interface
 int Character::getLevel()
 {
 	return level;
+}
+
+int Character::getBaseBonus()
+{
+	return baseBonusAtk;
+}
+
+int Character::getAttacksSize()
+{
+	return length;
+}
+
+void Character::SetAttack()
+{
+	int roll;
+
+	for (size_t i = 0; i < length; i++)
+	{
+		roll = dice.roll(1, 20);
+		*(totalDamagePerRound + i) = *(attacks + i) + baseBonusAtk + roll;
+	}
+}
+
+int Character::GetAttack(int attack)
+{
+	return totalDamagePerRound[attack];
 }
 
 bool Character::equipItem(string type){  //equip item for character

@@ -23,6 +23,12 @@ void CharacterSprite::attack(CharacterSprite* T){
 	{
 		delete T->s;
 		T->s = new AggressiveStrategy();
+
+		c->SetAttack();
+
+		for (size_t i = 0; i < c->getAttacksSize() - 1; i++)
+			T->c->hit(c->GetAttack(i));
+
 		cout << "The monster decides it hates you now" << endl;
 	}
 }

@@ -112,5 +112,32 @@ public:
 	void setFighterType(string s){
 		c->setFighterType(s);
 	}
+	int getBaseBonus()
+	{
+		return c->getBaseBonus();
+	}
+
+	virtual int getAttacksSize()
+	{
+		return c->getAttacksSize();
+	}
+
+	virtual void SetAttack()
+	{
+		return c->SetAttack();
+	}
+
+	virtual int GetAttack(int attack)
+	{
+		return c->GetAttack(attack);
+	}
+	virtual void setArmor()
+	{
+		return c->setArmor();
+	}
+	virtual void setBonusDamage()
+	{
+		return c->setBonusDamage();
+	}
 };
 

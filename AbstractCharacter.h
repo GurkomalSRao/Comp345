@@ -49,7 +49,12 @@ public:
 	virtual void setAbilityScore(int, int) = 0;
 	virtual string getFighterType() = 0;
 	virtual void setFighterType(string) = 0;
-
+	virtual int getBaseBonus() = 0;
+	virtual int getAttacksSize() = 0;
+	virtual void SetAttack() = 0;
+	virtual int GetAttack(int) = 0;
+	virtual void setArmor();
+	virtual void setBonusDamage();
 	/*int damageBonus();
 	bool equipItem(Item);
 	bool unequipItem(string);

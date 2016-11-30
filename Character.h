@@ -7,6 +7,7 @@
 #include<iostream>
 #include "AbstractCharacter.h"
 #include "ItemContainer.h"
+#include "Dice.h"
 
 using namespace std;
 
@@ -49,6 +50,12 @@ public:
 	vector<Item*> getEquipment();
 	string getFighterType();
 	void setFighterType(string);
+	int getAttacksSize();
+	void SetAttack();
+	int GetAttack(int);
+	int getBaseBonus();
+	void setArmor();
+	void setBonusDamage();
 private: 
 	string characterClass;
 	ItemContainer backpack;
@@ -58,8 +65,12 @@ private:
 	int currentHitPoints;
 	int level;
 	int* attacks = new int(1);
+	int* totalDamagePerRound = new int(1);
 	int length;
 	int baseBonusAtk;
 	string fighterType;
+	Dice dice;
+	int armorClass;
+	int bonusDamage;
 };
 
