@@ -9,6 +9,7 @@ public:
 	CharacterObserver(AbstractCharacter* conan);
 	~CharacterObserver();
 	void Update();
+	void Update(string s, bool logs[4]){};
 	void displayView();
 private:
 	AbstractCharacter* _character;

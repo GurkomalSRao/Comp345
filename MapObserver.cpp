@@ -2,7 +2,7 @@
 //! @brief Implementation file for the Map Observer class  
 //!
 #include "MapObserver.h"
-#include <iostream>
+//#include <iostream>
 #include <random>
 
 using namespace std;
@@ -28,13 +28,15 @@ void MapObserver::Update(){
 	displayMap();
 }
 
+
 void MapObserver::displayMap(){
 
 	system("cls");
 	cout << endl << "----------------FULL MAP---------------- "<< endl;
 	_map->printFullMap();
+	_map->getAvatar()->c->display();
 	
-	/*for (int i = 0; i < MAP_MAXLENGTH; i++){
+	/*for (int i = 0; i < MA()P_MAXLENGTH; i++){
 		for (int j = 0; j < MAP_MAXWIDTH; j++){
 			cout << _map->getCell(i, j);
 		}

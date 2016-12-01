@@ -26,9 +26,11 @@ public:
 	bool displayEquipedItems(string s);
 	Item* getItem(string s);
 	vector<Item*> getEquipment();
+	bool deaditem;//defines if Armor is an empty item
+	//isDead();
 	~Armor();
 private:
 	Item *it;
 	bool equiped;//validator to check if Armor is already equipped
-	bool deaditem;//defines if Armor is an empty item
+	
 };

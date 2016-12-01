@@ -25,9 +25,10 @@ public:
 	bool displayEquipedItems(string s);
 	Item* getItem(string s);
 	vector<Item*> getEquipment();
+	bool deaditem;//defines if Belt is an empty item
 	~Belt();
 private:
 	Item *it;
 	bool equiped;//validator to check if Belt is already equipped
-	bool deaditem;//defines if Belt is an empty item
+	
 };

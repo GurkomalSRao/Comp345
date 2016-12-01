@@ -34,8 +34,9 @@ public:
 	Item* getItem(string s);
 	vector<Item*> getEquipment();
 	~Ring();
+	bool deaditem;//defines if Ring is an empty item
 private:
 	Item *it;
 	bool equiped;//validator to check if Ring is already equipped
-	bool deaditem;//defines if Ring is an empty item
+	
 };

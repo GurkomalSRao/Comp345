@@ -7,6 +7,7 @@
 #include <time.h>
 #include <iostream>
 #include <fstream>
+#include "DiceObserver.h"
 #include <random>
 #include <string>
 using namespace std;
@@ -14,6 +15,7 @@ using namespace std;
 //! Constructor: passes values to each ability score and set hit points to 10
 Character::Character(int str, int dex, int con, int intel, int wis, int cha)
 {
+	dice = new Dice();
 	abilityScores[0] = str; 
 	abilityScores[1] = dex;
 	abilityScores[2] = con;
@@ -24,14 +26,20 @@ Character::Character(int str, int dex, int con, int intel, int wis, int cha)
 	// and set hit points to 10
 	currentHitPoints = 10 + abilityModifier(2);
 	// set inital attack bonus
-	baseBonusAtk = abilityModifier(0) + abilityModifier(1);
+	//baseBonusAtk = abilityModifier(0) + abilityModifier(1);
 	level = 1;
-	length = 1;
+	//length = 1;
 }
-
+Character::Character(bool b)//exists because reasons
+{
+	dice = new Dice();
+}
 Character::Character()  //generated random ability scores and class set to fighter
 {
-	abilityScores[0] = abilityScore();
+	characterClass = "fighter";
+	//dice = new Dice();
+	//attacks = new int(1);
+	/*abilityScores[0] = abilityScore();
 	abilityScores[1] = abilityScore();
 	abilityScores[2] = abilityScore();
 	abilityScores[3] = abilityScore();
@@ -42,14 +50,67 @@ Character::Character()  //generated random ability scores and class set to fight
 	//fill equipment slots with empty item
 	/*for (int i = 0; i < 7; i++){
 		equipment[i] = noItem;
-	}*/
+	}
 	attacks = new int(1);
 	currentHitPoints = 10 + abilityModifier(2);
 	characterClass = "fighter";
 	baseBonusAtk = abilityModifier(0) + abilityModifier(1);
 	level = 1;
 	length = 1;
+	Notify();*/
+	level = 1;
+	abilityScores[0] = 0;
+	abilityScores[1] = 0;
+	abilityScores[2] = 0;
+	abilityScores[3] = 0;
+	abilityScores[4] = 0;
+	abilityScores[5] = 0;
+	currentHitPoints = 1;
+	dice = new Dice();
 	Notify();
+}
+
+Character::Character(Dice* die)
+{
+	dice = die;
+	abilityScores[0] = abilityScore();
+	abilityScores[1] = abilityScore();
+	abilityScores[2] = abilityScore();
+	abilityScores[3] = abilityScore();
+	abilityScores[4] = abilityScore();
+	abilityScores[5] = abilityScore();
+	
+
+	//fill equipment slots with empty item
+	/*for (int i = 0; i < 7; i++){
+	equipment[i] = noItem;
+	}*/
+	//attacks = new int(1);
+	currentHitPoints = 10 + abilityModifier(2);
+	characterClass = "fighter";
+	//baseBonusAtk = abilityModifier(0) + abilityModifier(1);
+	level = 1;
+	//length = 1;
+	Notify();
+}
+
+void Character::setCharName(string name)
+{
+	charName = name;
+}
+
+string Character::getCharName()
+{
+	return charName;
+}
+
+void Character::setDice(Dice* die)
+{
+	dice = die;
+}
+
+Dice* Character::getDice(){
+	return dice;
 }
 
 //! Implementation of the verification of a newly created Character
@@ -84,32 +145,12 @@ void Character::setHitPoints(int hp){
 
 int Character::abilityScore()  //generates random ability score
 {
-	int score = 0;
-	int diceTurns[4] = {};
-	//score = rand() % 6 + 1;
-	int lowest = 6;
-	int total = 0;
-	srand(time(0));
-	random_device rd;
-	mt19937 gen(rd());  //initializes the generater
-	uniform_int_distribution<> dis(1, 6);  //generates a range from 1 to 6
-
-	for (int i = 0; i < 4; i++)
-	{
-
-		score = dis(gen);  //calls the generater to generate a random number
-		diceTurns[i] = score;
-
-		if (diceTurns[i] < lowest)
-		{
-			lowest = diceTurns[i];
-		}
-		total += diceTurns[i];
-	}
-	total -= lowest;
-
-	return total;
+	int roll;
+	roll = dice->roll(4, 6);
+//	NotifyGame("Dice Roll For Ability Score: "+roll);
+	return roll;
 }
+
 
 int Character::abilityModifier(int ability)
 {
@@ -119,11 +160,10 @@ int Character::abilityModifier(int ability)
 
 void Character::modifyHP()
 {
-	srand(time(0));
-	random_device rd;
-	mt19937 gen(rd());  //initializes the generater
-	uniform_int_distribution<> dis(1, 10);  //generates a range from 1 to 10
-	currentHitPoints += dis(gen) + abilityModifier(2);
+	int roll = 0;
+	roll = dice->roll(1, 10);
+	currentHitPoints += roll + abilityModifier(2);
+	//NotifyGame("Dice Roll For HP: " + roll,logs);
 	Notify();
 }
 
@@ -139,18 +179,18 @@ void Character::setLevel(int lvl)  //updates/sets the level of the character inc
 
 int Character::armor()
 {
-	armorClass = 10 + abilityModifier(1);
+	int armorClass = 10 + abilityModifier(1);
 	return armorClass;
 }
 
-void Character::setArmor()
-{
-	armorClass = 10 + abilityModifier(1);
-}
+//void Character::setArmor()
+//{
+	//armorClass = 10 + abilityModifier(1);
+//}
 
-int* Character::attackBonus()
+int Character::attackBonus()
 {
-	int bonusPerRound = level;
+	/*int bonusPerRound = level;
 	if (level % 5 == 1)
 	{
 		length++;
@@ -165,29 +205,72 @@ int* Character::attackBonus()
 			attacks[i] = bonusPerRound;
 			bonusPerRound -= 5;
 		}
+	}*/
+
+	return abilityModifier(0);
+}
+
+int Character::getBonusAttacks(){
+	return 1 +((1- level) / 5);
+}
+
+/*void Character::SetBonusAttacks(int lvl)
+{
+	int bonusPerRound = lvl;
+
+	int bonusattacks = 
+	int* 
+	if (level % 5 == 1)
+	{
+		size++;
+		attacks = new int(size);
+		totalDamagePerRound = new int(size);
 	}
 
-	return attacks;
-}
+	for (size_t i = 0; i < bonusattacks - 1; i++)
+	{
+		if (bonusPerRound > 0)
+		{
+			attacks[i] = bonusPerRound;
+			bonusPerRound -= 5;
+		}
+	}
+}*/
 
 int Character::damageBonus()
 {
 	return abilityModifier(0); 
 }
 
-void Character::setBonusDamage()
+//void Character::setBonusDamage()
+//{
+//	bonusDamage = abilityModifier(0);
+//}
+
+int Character::getAccuracy(int attack)
 {
-	bonusDamage = abilityModifier(0);
+	int roll;
+	roll = dice->roll(1, 20);
+	int damage = attackBonus() + roll + level - (5 * (attack - 1));
+
+	//NotifyGame("Attack Roll: " + roll);
+	return damage;
+}
+
+int Character::getDamage()
+{
+	int roll;
+	roll = dice->roll(1,8);
+	int damage = roll + damageBonus();
+	//NotifyGame("Damage Roll: " + roll);
+	return damage;
 }
 
 void Character::display() //displays the view of the character interface
 {
 	cout << "Class: " << characterClass << " Level: " << level << " HP: " << currentHitPoints << " AC: " << armor() << " Bonus Atk: ";
-	cout << *(attacks + 0) << " ";
-	for (size_t i = 1; i < length - 1; i++)
-	{
-		cout << *(attacks + i) << " ";
-	}
+	cout << attackBonus() << " ";
+	
 	cout << " BD " << damageBonus() << endl;
 	cout << "St: " << abilityScores[0] << " Dx: " << abilityScores[1] << " Co: " << abilityScores[2]
 		<< " In: " << abilityScores[3] << " Wi: " << abilityScores[4] << " Ch: " << abilityScores[5] << endl << endl;
@@ -198,36 +281,51 @@ int Character::getLevel()
 	return level;
 }
 
-int Character::getBaseBonus()
-{
-	return baseBonusAtk;
-}
+//int Character::getBaseBonus()
+//{
+	//return baseBonusAtk;
+//}
 
-int Character::getAttacksSize()
-{
-	return length;
-}
+//int Character::getAttacksSize()
+//{
+	//return length;
+//}
 
-void Character::SetAttack()
+/*void Character::SetAttack()
 {
-	int roll;
+	
 
 	for (size_t i = 0; i < length; i++)
 	{
-		roll = dice.roll(1, 20);
+		roll = dice->roll(1, 20);
 		*(totalDamagePerRound + i) = *(attacks + i) + baseBonusAtk + roll;
+		NotifyGame("Dice Roll For attacking: " + roll);
 	}
+}*/
+
+void Character::setCharacterLevel(int lvl){
+	level = lvl;
 }
 
 int Character::GetAttack(int attack)
 {
-	return totalDamagePerRound[attack];
+	int roll;
+	int damage;
+	//for (size_t i = 0; i < length; i++)
+	//{
+		roll = dice->roll(1, 20);
+		damage =  attackBonus() + roll + level -(5*(attack-1));
+
+		//NotifyGame("Dice Roll For attacking: " + roll);
+		return damage;
+	//}
+	//return totalDamagePerRound[attack];
 }
 
-int Character::getBonusAtks(int batkIndex)
+/*int Character::getBonusAtks(int batkIndex)
 {
 	return *(attacks + batkIndex);
-}
+}*/
 
 bool Character::equipItem(string type){  //equip item for character
 	
@@ -324,13 +422,13 @@ void Character::setAbilityScores(string classType)  //sets the abilityscores acc
 		fighterType = "Tank";
 	}
 	//set your inital base bonus atk
-	baseBonusAtk = abilityModifier(0) + abilityModifier(1);
+	//baseBonusAtk = abilityModifier(0) + abilityModifier(1);
 	level = 1;
 }
 
-void Character::initializeBonusAttack(){
-	baseBonusAtk = abilityModifier(0) + abilityModifier(1);
-}
+//void Character::initializeBonusAttack(){
+	//baseBonusAtk = abilityModifier(0) + abilityModifier(1);
+//}
 
 void Character::setAbilityScore(int index, int value){
 	abilityScores[index] = value;

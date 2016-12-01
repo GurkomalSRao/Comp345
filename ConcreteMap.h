@@ -10,6 +10,8 @@
 using namespace std;
 
 
+
+
 //! Character implementing a character sprite
 
 //! class implementing a treasure sprite
@@ -58,7 +60,7 @@ class ConcreteMap : public Subject
 		bool isOccupied(int x, int y);
 		bool canWalk(int x, int y);
 		bool findTile(char find, int& x, int& y);
-		bool removeMonster(int i);
+		bool removeMonster(CharacterSprite* m);
 		bool removeTreasure(Coordinates p);
 		AbstractCharacter* getMonster(int i);
 		Item* getTreasure(int i);

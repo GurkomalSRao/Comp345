@@ -20,8 +20,9 @@ Character* Fighter::getCharacter()
 	return myCharacterBuilder->getCharacter();
 }
 
-void Fighter::constructCharacter()
+void Fighter::constructCharacter(Dice* d)
 {
-	myCharacterBuilder->createNewCharacter();
+	myCharacterBuilder->createNewCharacter(d);
+	//myCharacterBuilder->getCharacter();
 	myCharacterBuilder->setScores();
 }

@@ -27,8 +27,8 @@ public:
 	Item* getItem(string s);
 	vector<Item*> getEquipment();
 	~Shield();
+	bool deaditem;//defines if Shield is an empty item
 private:
 	Item *it;
-	bool deaditem;//defines if Shield is an empty item
 	bool equiped;//validator to check if Shield is already equipped
 };

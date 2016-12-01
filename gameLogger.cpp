@@ -1,18 +1,15 @@
 #include "gameLogger.h"
 
-
 gameLogger::gameLogger()
 {
 }
-gameLogger::gameLogger(ConcreteMap* m, AbstractCharacter* c){
-	_map = m;
-	_char = c;
+
+gameLogger::gameLogger(AbstractCharacter* conan, ConcreteMap* map, Dice* dice, gameEngine* game){
+	//_character = conan;	
+	//_game = game;
+	//_game->Attach(this);
 }
 
 gameLogger::~gameLogger()
 {
-}
-
-void gameLogger::display(){
-
 }

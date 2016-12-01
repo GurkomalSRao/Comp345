@@ -33,8 +33,9 @@ public:
 	Item* getItem(string s);
 	vector<Item*> getEquipment();
 	~Boots();
+	bool deaditem;//defines if Boots is an empty item
 private:
 	Item *it;
 	bool equiped;//validator to check if Boots is already equipped
-	bool deaditem;//defines if Boots is an empty item
+	
 };

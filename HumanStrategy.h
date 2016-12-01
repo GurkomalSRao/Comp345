@@ -11,14 +11,17 @@ enum Direction;
 #include<iostream>
 #include <string>
 #include "SpriteStrategy.h"
-#include "ConcreteMap.h"//for the direction enum
+#include "ConcreteMap.h"
 #include "CharacterSprite.h"
+//#include "gameEngine.h"
 using namespace std;
+
+//class ConcreteMap;
 
 //! Implementation of a strategy for the player
 class HumanStrategy : public SpriteStrategy {
 public:
-	int getStrategy(){
+	int getStrategyNumber(){
 		return 1;
 	}
 
@@ -29,8 +32,8 @@ public:
 	//! @param avatar: the player character
 	//! @param monsters: a list of monsters
 	//! @param function: the function to be performed to update the map
-	void execute(int speed, int attacks, CharacterSprite* me, CharacterSprite* avatar, vector<CharacterSprite*>* monsters, ConcreteMap* m) {
-		cout << "Move using WASD, or press F to stop moving";
+	void execute(int speed, int attacks, CharacterSprite* me, CharacterSprite* avatar, vector<CharacterSprite*>* monsters, ConcreteMap* m,void(*log)(), bool logs[4]) {
+		cout << "Move using WASD, press E to view equipment, or press F to stop moving: "<<endl;
 		for (int i = 0; i < speed; i++)
 		{
 			char c;
@@ -40,19 +43,36 @@ public:
 			{
 			case 'W':
 				if (!(m->moveCharacter(Direction::up, me)))
+				{
+					NotifyGame("Player Moves Up", logs);
 					i--;
+				}
 				break;
 			case 'S':
-				if (!(m->moveCharacter(Direction::down, me)))
+				if (!(m->moveCharacter(Direction::down, me))){
+					NotifyGame("Player Moves Down", logs);
 					i--;
+				}
+					
 				break;
 			case 'A':
-				if (!(m->moveCharacter(Direction::left, me)))
+				if (!(m->moveCharacter(Direction::left, me))){
+
+					NotifyGame("Player Moves left", logs);
 					i--;
+				}
 				break;
 			case 'D':
-				if (!(m->moveCharacter(Direction::right, me)))
+				if (!(m->moveCharacter(Direction::right, me))){
+					NotifyGame("Player Moves right", logs);
 					i--;
+				}
+				break;
+			case 'E':
+				me->displayEquipedItems(logs);
+				break;
+			case 'L':
+				log();
 				break;
 			case 'F':
 				i = speed;
@@ -106,8 +126,14 @@ public:
 				{
 					if ((monsters->at(j)->pos.x == toatk.x && monsters->at(j)->pos.y == toatk.y))
 					{
-						me->attack(monsters->at(j));
-						cout << "You give the monster a knuckle sandwich!" << endl;
+						me->attack(monsters->at(j),i,logs);
+						if (monsters->at(j)->c->getHitPoints() <= 0)
+						{
+							cout << "You killed " << monsters->at(j)->c->getCharName() << endl;
+							m->removeMonster(monsters->at(j));
+
+						}
+						//cout << "You give the monster a knuckle sandwich!" << endl;
 					}
 				}
 			}

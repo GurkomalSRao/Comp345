@@ -16,11 +16,17 @@ public:
 
 	~ItemDecorator();
 
+
+	void setCharacterLevel(int i){
+		c->setCharacterLevel(i);
+	}
 	int getAbilityScore(int index){
 
 		return c->getAbilityScore(index);
 	}
-
+	int getBonusAttacks(){
+		return c->getBonusAttacks();
+	}
 	int armor(){
 		return c->armor();
 	}
@@ -29,6 +35,9 @@ public:
 	}
 	void hit(int i) {
 		c->hit(i);
+	}
+	Dice* getDice(){
+		return c->getDice();
 	}
 	int getHitPoints() {
 		return c->getHitPoints();
@@ -48,7 +57,7 @@ public:
 	void setLevel(int i) {
 		c->setLevel(i);
 	}
-	int* attackBonus(){
+	int attackBonus(){
 		return c->attackBonus();
 	}
 	int damageBonus(){
@@ -112,38 +121,59 @@ public:
 	void setFighterType(string s){
 		c->setFighterType(s);
 	}
-	int getBaseBonus()
+	/*int getBaseBonus()
 	{
 		return c->getBaseBonus();
-	}
+	}*/
 
-	 int getAttacksSize()
+	/* int getAttacksSize()
 	{
 		return c->getAttacksSize();
-	}
+	}*/
 
-	 void SetAttack()
+	/* void SetAttack()
 	{
 		return c->SetAttack();
-	}
+	}*/
 
 	 int GetAttack(int attack)
 	{
 		return c->GetAttack(attack);
 	}
-	 void setArmor()
+	/* void setArmor()
 	{
 		return c->setArmor();
-	}
-	 void setBonusDamage()
+	}*/
+	/* void setBonusDamage()
 	{
 		return c->setBonusDamage();
-	}
-	 int getBonusAtks(int i){
+	}*/
+	 /*int getBonusAtks(int i){
 		return c->getBonusAtks(i);
-	 }
-	 void initializeBonusAttack(){
+	 }*/
+	 /*void initializeBonusAttack(){
 		 c->initializeBonusAttack();
+	 }*/
+	 void setDice(Dice* die)
+	 {
+		 c->setDice(die);
 	 }
+	 int getAccuracy(int acc)
+	 {
+		 return c->getAccuracy(acc);
+	 }
+	 int getDamage()
+	 {
+		 return c->getDamage();
+	 }
+	 void setCharName(string s)
+	 {
+		c->setCharName(s);
+	 }
+	 string getCharName()
+	 {
+		 return c->getCharName();
+	 }
+
 };
 

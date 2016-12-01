@@ -29,29 +29,40 @@ gameEngine::~gameEngine()
 	delete myCharacter;
 }
 
-void gameEngine::run(){
-	startMenu();
+void gameEngine::run(void(*log)(),bool logs[]){
+	NotifyGame("Game Start.",logs);
+	startMenu(log,logs);
 }
 
-void gameEngine::startMenu(){//TODO:  improve menu loop
+void gameEngine::startMenu(void(*log)(), bool logs[]){//TODO:  improve menu loop
+	
 	char input;
 	string mapName = "";
-	myCharacter = new Character();
-	Map* m = new Map();	
-
+	string fileName;
+	//myCharacter = new Character();
+	Map* m = new Map();
+	Campaign* c = new Campaign();
+	dice = new Dice();
+	observableDice = new DiceObserver(dice);
+	
 	while (true){
 		Item* it;
 		printMainMenu();
 		cin >> input;
-		
 		switch (toupper(input)){
 		case 'C':
+			myCharacter = new Character();
 			loadCharacter();
+			NotifyGame("Character Loaded",logs);
+			//cout << "here";
+			
+			myCharacter->setDice(dice);
 			characterLoaded = true;
 			observableCharacters = new CharacterObserver(myCharacter);
 			break;
 		case 'I':
-			createItem(items);
+			createItem(items, logs);
+
 			break;
 		case 'L':
 			it = new Item();
@@ -66,14 +77,22 @@ void gameEngine::startMenu(){//TODO:  improve menu loop
 			system("cls");
 			break;
 		case 'M':
-			if (loadMap(m))
+			if (loadCampaign(myCampaign))
+			{
 				mapLoaded = true;
+				NotifyGame("Campaign Loaded.", logs);
+			}
+			break;
+		case 'T':
+			log();
 			break;
 		case 'P':
 			if (mapLoaded)
 			{
 				while (!characterLoaded)
 				{ 
+					
+					
 					Fighter fighter;
 					CharacterBuilder* FighterBuilder;
 					int charSelect;
@@ -84,7 +103,7 @@ void gameEngine::startMenu(){//TODO:  improve menu loop
 						
 						FighterBuilder = new BullyFighterBuilder();
 						fighter.setCharacterBuilder(FighterBuilder);
-						fighter.constructCharacter();
+						fighter.constructCharacter(dice);
 
 						myCharacter = fighter.getCharacter();
 						observableCharacters = new CharacterObserver(myCharacter);
@@ -93,7 +112,7 @@ void gameEngine::startMenu(){//TODO:  improve menu loop
 					case 2:
 						FighterBuilder = new NimbleFighterBuilder();
 						fighter.setCharacterBuilder(FighterBuilder);
-						fighter.constructCharacter();
+						fighter.constructCharacter(dice);
 
 						myCharacter = fighter.getCharacter();
 						observableCharacters = new CharacterObserver(myCharacter);
@@ -102,7 +121,7 @@ void gameEngine::startMenu(){//TODO:  improve menu loop
 					case 3:
 						FighterBuilder = new TankFighterBuilder();
 						fighter.setCharacterBuilder(FighterBuilder);
-						fighter.constructCharacter();
+						fighter.constructCharacter(dice);
 
 						myCharacter = fighter.getCharacter();
 						observableCharacters = new CharacterObserver(myCharacter);
@@ -111,14 +130,41 @@ void gameEngine::startMenu(){//TODO:  improve menu loop
 					default:
 						cout << "Incorrect Choice Try Again" << endl;
 					}
+					NotifyGame("New Fighter Created", logs);
 				}
+
+				
 				system("cls");
-				myMap = new ConcreteMap(m , myCharacter);
-				observableMap = new MapObserver(myMap);
-				for (int i = 0; i < items.size(); i++)
-					myMap->loadTreasure(items[i]);
-				myMap->initMap();
-				playGame();
+				myCharacter->setCharName("You");
+				for (int omdex = 0; omdex < myCampaign->num; omdex++)
+				{
+					Map* mopmap;
+					mopmap = new Map();
+					mopmap->loadMap(myCampaign->maps[omdex]);
+					myMap = new ConcreteMap(mopmap, myCharacter);
+					observableMap = new MapObserver(myMap);
+					for (int i = 0; i < items.size(); i++)
+						myMap->loadTreasure(items[i]);
+					myMap->initMap();
+					observableAvatar = new SpriteObserver(myMap->getAvatar());
+					observableMonsters = new vector<SpriteObserver*>();
+					for (int index = 0; index < myMap->getMonsters()->size(); index++)
+					{
+						observableMonsters->push_back(new SpriteObserver(myMap->getMonsters()->at(index)));
+					}
+					observableAvatarStrategy = new SpriteStrategyObserver(myMap->getAvatar()->getStrategy());
+					observableMonstersStrategy = new vector<SpriteStrategyObserver*>();
+					for (int index = 0; index < myMap->getMonsters()->size(); index++)
+					{
+						observableMonstersStrategy->push_back(new SpriteStrategyObserver(myMap->getMonsters()->at(index)->getStrategy()));
+					}
+
+					NotifyGame("Map" + to_string(omdex) +" of Campaign Loaded.", logs);
+					playGame(log, logs);
+				}
+				NotifyGame("Campaign Completed.", logs);
+				saveCharacter();
+				NotifyGame("Character Saved", logs);
 			}
 			else
 			{
@@ -126,6 +172,7 @@ void gameEngine::startMenu(){//TODO:  improve menu loop
 			}
 			break;
 		case 'X':
+			NotifyGame("Exit Game", logs);
 			cout << "Game will now exit" << endl;
 			exit(0);
 		default:
@@ -135,12 +182,14 @@ void gameEngine::startMenu(){//TODO:  improve menu loop
 	}
 }
 
-void gameEngine::moveCharacter(){
+
+
+void gameEngine::moveCharacter(void(*log)(), bool logs[]){
 	
-	myMap->getAvatar()->executeStrategy(myMap->getAvatar(),myMap->getMonsters(),myMap);
+	myMap->getAvatar()->executeStrategy(myMap->getAvatar(), myMap->getMonsters(), myMap, log,logs);
 	for (int i = 0; i < myMap->getMonsters()->size(); i++)
 	{
-		myMap->getMonsters()->at(i)->executeStrategy(myMap->getAvatar(), myMap->getMonsters(), myMap);
+		myMap->getMonsters()->at(i)->executeStrategy(myMap->getAvatar(), myMap->getMonsters(), myMap, log,logs);
 	}
 	/*char ch;
 	int coord_x, coord_y = 0;
@@ -180,7 +229,7 @@ void gameEngine::moveCharacter(){
 	*/
 }
 
-void gameEngine::playGame(){
+void gameEngine::playGame(void(*log)(), bool logs[]){
 	
 	while (true){
 		myMap->getAvatar()->c->display();
@@ -189,10 +238,12 @@ void gameEngine::playGame(){
 		if (myMap->getAvatarTile() == MONSTER_TILE)
 		{
 			cout << "You found a monster! Monster stats: " << endl;
+			//NotifyGame("Found Monster", logs);
 			myMap->getMonster(myMap->getAvatar()->pos)->display();
 		}
 		if (myMap->getAvatarTile() == TREASURE_TILE)
 		{
+			NotifyGame("Found Treasure", logs);
 			cout << "You got a treasure! Please check your inventory." << endl;
 			//Place treasure in inventory
 			myCharacter->addItemToInventory(myMap->getTreasure(myMap->getAvatar()->pos));
@@ -200,15 +251,54 @@ void gameEngine::playGame(){
 		}
 		if (myMap->getAvatarTile() == END_TILE){
 			//end the game
+			NotifyGame("Map Completed", logs);
 			endMap();
-			break;
+			NotifyGame("Character Leveled Up", logs);
+			return;
 		}
-		moveCharacter();
+		moveCharacter(log,logs);
 
 	}
 }
 
-bool gameEngine::loadMap(Map* &m)
+Campaign* gameEngine::loadCampaign(string fname){
+	Campaign* c = new Campaign();
+
+	ifstream input(fname);
+	bool badmaps = false;
+
+	for (int i = 0; !input.eof(); i++)
+	{
+		string s;
+		getline(input, s);
+		if (!s.empty())
+		{
+			Map* m = new Map();
+			m->loadMap(s);
+			if (!m->validatePath())
+			{
+				badmaps = true;
+			}
+			else
+			{
+				c->maps[c->num] = s;
+				c->num++;
+			}
+
+
+		}
+
+	}
+	if (badmaps)
+	{
+		cout << "One or more maps are invalid, excluding invalid maps..." << endl;
+		system("pause");
+	}
+
+	return c;
+
+}
+bool gameEngine::loadCampaign(Campaign* &c)
 {
 	cout << "Enter file name:(q to escape) ";
 	cout << endl;
@@ -225,25 +315,51 @@ bool gameEngine::loadMap(Map* &m)
 			return false;
 	}
 
-	m->loadMap(soap);
+	c = loadCampaign(soap);
 
-	if (m->validatePath() == false)
-	{
-		cout << "Map is invalid";
-		return false;
-	}
+	
 	return true;
 }
 
+//bool gameEngine::loadMap(Map* &m)
+//{
+//	cout << "Enter file name:(q to escape) ";
+//	cout << endl;
+//	string soap;
+//	cin >> soap;
+//	if (soap == "q")
+//		return false;
+//
+//	while (!ifstream(soap))
+//	{
+//		cout << "File does not exist, try again (press q to escape) ";
+//		cin >> soap;
+//		if (soap == "q")
+//			return false;
+//	}
+//
+//	m->loadMap(soap);
+//
+//	if (m->validatePath() == false)
+//	{
+//		cout << "Map is invalid";
+//		return false;
+//	}
+//	return true;
+//}
+
 void gameEngine::endMap(){
 	int levelUp = myCharacter->getLevel() + 1;
+
 	myCharacter->setLevel(levelUp);
-	saveCharacter();
+	
+	//if (myCampaign)
+	//saveCharacter();
 	system("cls");
-	exit(0);
+	//exit(0);
 }
 
-void gameEngine::createItem(vector<Item*> &items){
+void gameEngine::createItem(vector<Item*> &items, bool logs[]){
 	char type;
 	string itemName;
 	Enhancement tempEnhanceType;
@@ -279,7 +395,7 @@ void gameEngine::createItem(vector<Item*> &items){
 		case 'X':
 			cout << "Game will now go back to main menu" << endl;
 			system("pause");
-			startMenu();
+			return;
 		default:
 			cout << "Invalid input, try Again" << endl;
 		}
@@ -337,6 +453,7 @@ void gameEngine::createItem(vector<Item*> &items){
 		}
 	} while (!tempItem->validateItem());
 
+	NotifyGame("New Item Created", logs);
 	system("cls");
 	char option;
 	bool notDone = true;
@@ -351,8 +468,10 @@ void gameEngine::createItem(vector<Item*> &items){
 		case 'S':
 			tempItem->saveItem();
 			notDone = false;
+			NotifyGame("New Item Saved to File", logs);
 			break;
 		case 'G':
+			NotifyGame("New Item Inserted to Game Treasure Chests", logs);
 			items.push_back(tempItem);
 			notDone = false;
 			break;
@@ -363,13 +482,14 @@ void gameEngine::createItem(vector<Item*> &items){
 	
 }
 
-void gameEngine::equipItemInterface(){
+void gameEngine::equipItemInterface(bool logs[]){
 	
 	char type;
 	if (myCharacter->getBackPack().getSize() > 0){
 		while (true){
 			system("cls");
 			printEquipmentInterface();
+			NotifyGame("Loaded Equipment Interface", logs);
 			cout << "ITEM EQUIPMENT SCREEN" << endl;
 			cout << " ------------------------------------------------------- " << endl;
 			cout << "| H - Equip/Unequip Helmet                            |" << endl;
@@ -389,66 +509,87 @@ void gameEngine::equipItemInterface(){
 				if (!myCharacter->isEquiped("Helmet")){
 					myCharacter = new Helmet(myCharacter, myCharacter->getBackPack().getItem("Helmet"));
 					myCharacter->equipItem("Helmet");
+					NotifyGame("Equiped Helmet", logs);
 				}
-				else
+				else{
 					myCharacter->unequipItem(myCharacter->unsetItem("Helmet"));
+					NotifyGame("Equip Helmet", logs);
+				}
 				break;
 			case 'A':
 				//myCharacter->equipItem(myCharacter->getBackPack().getItem("Armor"));
 				if (!myCharacter->isEquiped("Armor")){
 					myCharacter = new Armor(myCharacter, myCharacter->getBackPack().getItem("Armor"));
 					myCharacter->equipItem("Armor");
+					NotifyGame("Equiped Armor", logs);
 				}
-				else
+				else{
 					myCharacter->unequipItem(myCharacter->unsetItem("Armor"));
+					NotifyGame("Unequiped Armor", logs);
+				}
 				break;
 			case 'S':
 				//myCharacter->equipItem(myCharacter->getBackPack().getItem("Shield"));
 				if (!myCharacter->isEquiped("Shield")){
 					myCharacter = new Shield(myCharacter, myCharacter->getBackPack().getItem("Shield"));
 					myCharacter->equipItem("Shield");
+					NotifyGame("Equiped Shield", logs);
 				}
-				else
+				else{
 					myCharacter->unequipItem(myCharacter->unsetItem("Shield"));
+					NotifyGame("Unequiped Shield", logs);
+				}
 				break;
 			case 'R':
 				//myCharacter->equipItem(myCharacter->getBackPack().getItem("Ring"));
 				if (!myCharacter->isEquiped("Ring")){
 					myCharacter = new Ring(myCharacter, myCharacter->getBackPack().getItem("Ring"));
 					myCharacter->equipItem("Ring");
+					NotifyGame("Equiped Ring", logs);
 				}
-				else
+				else{
 					myCharacter->unequipItem(myCharacter->unsetItem("Ring"));
+					NotifyGame("Unequiped Ring", logs);
+				}
 				break;
 			case 'L':
 				//myCharacter->equipItem(myCharacter->getBackPack().getItem("Belt"));
 				if (!myCharacter->isEquiped("Belt")){
 					myCharacter = new Belt(myCharacter, myCharacter->getBackPack().getItem("Belt"));
 					myCharacter->equipItem("Belt");
+					NotifyGame("Equiped Belt", logs);
 				}
-				else
+				else{
 					myCharacter->unequipItem(myCharacter->unsetItem("Belt"));
+					NotifyGame("Unequiped Belt", logs);
+				}
 				break;
 			case 'B':
 				//myCharacter->equipItem(myCharacter->getBackPack().getItem("Boots"));
 				if (!myCharacter->isEquiped("Boots")){
 					myCharacter = new Boots(myCharacter, myCharacter->getBackPack().getItem("Boots"));
 					myCharacter->equipItem("Boots");
+					NotifyGame("Equiped Boots", logs);
 				}
-				else
+				else{
 					myCharacter->unequipItem(myCharacter->unsetItem("Boots"));
+					NotifyGame("Unequiped Boots", logs);
+				}
 				break;
 			case 'W':
 				//myCharacter->equipItem(myCharacter->getBackPack().getItem("Weapon"));
 				if (!myCharacter->isEquiped("Weapon")){
 					myCharacter = new Weapon(myCharacter, myCharacter->getBackPack().getItem("Weapon"));
 					myCharacter->equipItem("Weapon");
+					NotifyGame("Equiped Weapon", logs);
 				}
-				else
+				else{
 					myCharacter->unequipItem(myCharacter->unsetItem("Weapon"));
+					NotifyGame("Unequiped Weapon", logs);
+				}
 				break;
 			case 'X':
-				playGame();
+				return;
 			default:
 				cout << "Invalid input, try Again" << endl;
 			}
@@ -457,7 +598,7 @@ void gameEngine::equipItemInterface(){
 	else{
 		cout << "No Items to swap, Resuming Game..." << endl;
 		system("pause");
-		playGame();
+		return;
 	}
 
 }
@@ -468,6 +609,7 @@ void gameEngine::saveCharacter(){
 	vector<Item*> equipment;
 	equipment = myCharacter->getEquipment();
 	string fileName;
+	cout << "Input file name for character save" << endl;
 	cout << "File Name: ";
 	cin >> fileName;
 
@@ -530,6 +672,8 @@ void gameEngine::loadCharacter(){
 	cout << "Load File: ";
 	cin >> fileName;
 
+//	myCharacter->setFighterType("Fighter");
+
 	ifstream input(fileName);
 	do{
 		while (!input.good()){
@@ -552,9 +696,7 @@ void gameEngine::loadCharacter(){
 	input >> type;
 	myCharacter->setFighterType(type);
 	input >> level;
-	for (size_t i = 0; i <= level; i++){	//needed dont remove
-		myCharacter->setLevel(i);
-	}
+	myCharacter->setCharacterLevel(level);
 
 	input >> hp;
 	myCharacter->setHitPoints(hp);
@@ -562,7 +704,7 @@ void gameEngine::loadCharacter(){
 		input >> abilityScore;
 		myCharacter->setAbilityScore(i, abilityScore);
 	}
-	myCharacter->SetAttack();
+	//myCharacter->SetAttack();
 
 	input >> loopValidation;
 	string itemType;
@@ -588,7 +730,7 @@ void gameEngine::loadCharacter(){
 			
 			tempEnhance = new Enhancement(type, bonus);
 			tempItem->setInfluences(*tempEnhance);
-			delete tempEnhance;
+			//delete tempEnhance;
 		}
 		if (itemType == "Helmet"){
 			myCharacter = new Helmet(myCharacter, tempItem);
@@ -611,6 +753,7 @@ void gameEngine::loadCharacter(){
 		else if (itemType == "Weapon"){
 			myCharacter = new Weapon(myCharacter, tempItem);
 		}
+		myCharacter->getLevel();
 		//delete tempItem;
 	}
 
@@ -646,6 +789,7 @@ void gameEngine::loadCharacter(){
 		}
 	}
 	input.close();
+	
 	//return myCharacter;
 }
 
@@ -662,11 +806,12 @@ void gameEngine::printMainMenu(){
 		mapLoad = 'X';
 	cout << " ------------------------------------------------------- " << endl;
 	cout << "| C - Load Character                                    |" << endl;
-	cout << "| M - Load Map                                          |" << endl;
+	cout << "| M - Load Campaign                                     |" << endl;
 	cout << "| E - Edit/Create Map                                   |" << endl;
 	cout << "| I - Create Item                                       |" << endl;
 	cout << "| L - Load Item                                         |" << endl;
 	cout << "| P - Play Game                                         |" << endl;
+	cout << "| T - Toggle Game Logger                                |" << endl;
 	cout << "| X - Exit Program                                      |" << endl;
 	cout << " ------------------------------------------------------- " << endl;
 	cout << "|           Character Loaded [" << charLoad << "] Map Loaded [" << mapLoad << "]         |" << endl;
@@ -750,7 +895,7 @@ void gameEngine::printInformation()
 	cout << endl << endl<< "Chest Information" << endl;
 	myMap->displayChestInfo();
 	system("pause");
-	playGame();
+	return;
 }
 
 void gameEngine::printFighterSelect(){

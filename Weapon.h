@@ -21,7 +21,7 @@ public:
 		return c->damageBonus() + (deaditem ? 0 : getDamageBonus());
 	}
 	//method to increment attack bonus of character on weapon equipped
-	int* attackBonus(){
+	int attackBonus(){
 		return c->attackBonus() + (deaditem ? 0 : getAttackBonus());
 	}
 	//method to get attack bonus of  weapon equipped
@@ -36,8 +36,9 @@ public:
 	Item* getItem(string s);
 	vector<Item*> getEquipment();
 	~Weapon();
-private:
 	bool deaditem;		//defines if weapon is an empty item
+private:
+	
 	bool equiped;		//validator to check if weapon is already equipped
 	Item *it;
 };

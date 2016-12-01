@@ -10,6 +10,7 @@ public:
 	MapObserver(ConcreteMap* m);
 	~MapObserver();
 	void Update();
+	void Update(string s, bool logs[4]){};
 	void displayMap();
 private:
 	ConcreteMap *_map;

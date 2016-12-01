@@ -7,6 +7,7 @@
 #include<iostream>
 #include "Item.h"
 #include "Subject.h"
+#include "Dice.h"
 #include "ItemContainer.h"
 const int ITEM_SLOTS = 7;
 using namespace std;
@@ -17,17 +18,20 @@ class AbstractCharacter : public Subject
 {
 public:
 	virtual bool validateNewCharacter()=0;
+	virtual void setCharacterLevel(int) = 0;
 	virtual void hit(int) = 0;
 	virtual Item* unsetItem(string s) = 0;
+	virtual int getBonusAttacks() = 0;
 	virtual bool isEquiped(string s) = 0;
 	virtual int getHitPoints() = 0;
+	virtual Dice* getDice() = 0;
 	virtual int abilityScore() = 0;
 	virtual int abilityModifier(int) = 0;
 	virtual void modifyHP() = 0;
 	virtual void setLevel(int) = 0;
 	virtual int armor() = 0;
 	virtual void addItemToInventory(Item* i) = 0;
-	virtual int* attackBonus() = 0;
+	virtual int attackBonus() = 0;
 	virtual int damageBonus() = 0;
 	virtual string getClass()=0;
 	virtual void display() = 0;
@@ -49,14 +53,20 @@ public:
 	virtual void setAbilityScore(int, int) = 0;
 	virtual string getFighterType() = 0;
 	virtual void setFighterType(string) = 0;
-	virtual int getBaseBonus() = 0;
-	virtual int getAttacksSize() = 0;
-	virtual void SetAttack() = 0;
+	//virtual int getBaseBonus() = 0;
+	//virtual int getAttacksSize() = 0;
+	//virtual void SetAttack() = 0;
 	virtual int GetAttack(int) = 0;
-	virtual void setArmor() = 0;
-	virtual void setBonusDamage() = 0;
-	virtual int getBonusAtks(int) = 0;
-	virtual void initializeBonusAttack() = 0;
+	//virtual void setArmor() = 0;
+	//virtual void setBonusDamage() = 0;
+	//virtual int getBonusAtks(int) = 0;
+	//virtual void initializeBonusAttack() = 0;
+	virtual void setDice(Dice*) = 0;
+	virtual int getAccuracy(int)=0;
+	virtual int getDamage()= 0;
+	virtual void setCharName(string) = 0;
+	virtual string getCharName() = 0;
+	//const Item noItem;
 	/*int damageBonus();
 	bool equipItem(Item);
 	bool unequipItem(string);
@@ -67,7 +77,7 @@ public:
 	int getLevel();
 	void saveCharacter();
 	void loadCharacter();
-	const Item noItem;
+	
 	void monsterClass();
 	ItemContainer getBackPack();
 	void setAbilityScores(string);

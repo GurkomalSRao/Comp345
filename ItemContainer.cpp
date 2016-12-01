@@ -43,6 +43,7 @@ Item* ItemContainer::getItem(string itemType)
 	for (int i = 0; i < size; i++)
 		if (Items[i]->getType() == itemType)
 			return Items[i];
+	return NULL;
 }
 //! method that returns the size of the container (amount of items within container)
 //! @return: returns an integer value that represents the size of the Item Container

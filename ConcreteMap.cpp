@@ -135,12 +135,92 @@ void ConcreteMap::fillMonster(){
 				AbstractCharacter* monster = new Character();
 				monster->setLevel(level);
 				monster->monsterClass();
+				random_device rd;
+				mt19937 gen(rd());  //initializes the generater
+				uniform_int_distribution<> hoop(0, 9);  
+				int randomname = hoop(gen);
+				string fname;
+				string lname;
+
+				switch (randomname)
+				{
+					case 0:
+						fname = "Thirsty";
+						break;
+					case 1:
+						fname = "Sleepy";
+						break;
+					case 2:
+						fname = "Angry";
+						break;
+					case 3:
+						fname = "Lazy";
+						break;
+					case 4:
+						fname = "Soggy";
+						break;
+					case 5:
+						fname = "Lovely";
+						break;
+					case 6:
+						fname = "Gorgeous";
+						break;
+					case 7:
+						fname = "Magnificent";
+						break;
+					case 8:
+						fname = "Amazing";
+						break;
+					case 9:
+						fname = "Rajwinder";
+						break;
+
+
+				}
+				randomname = hoop(gen);
+				switch (randomname)
+				{
+				case 0:
+					lname = "Boogeyman";
+					break;
+				case 1:
+					lname = "Armadillo";
+					break;
+				case 2:
+					lname = "Toad";
+					break;
+				case 3:
+					lname = "Spook";
+					break;
+				case 4:
+					lname = "Wizard";
+					break;
+				case 5:
+					lname = "Horror";
+					break;
+				case 6:
+					lname = "Steve";
+					break;
+				case 7:
+					lname = "Rajistan";
+					break;
+				case 8:
+					lname = "Computer";
+					break;
+				case 9:
+					lname = "Potato";
+					break;
+
+
+				}
+				monster->setCharName(fname + " " + lname);
+
 				CharacterSprite* mmonster = new CharacterSprite();
 				mmonster->c = monster;
 				mmonster->pos.x = i;
 				mmonster->pos.y = j;
-				random_device rd;
-				mt19937 gen(rd());  //initializes the generater
+				//random_device rd;
+				//mt19937 gen(rd());  //initializes the generater
 				uniform_int_distribution<> dis(0, 1);  //generates a range from 0 to 6
 				enum itemTypes { Helmet, Armor, Weapon, Shield, Ring, Belt, Boots };
 				int randomItem = dis(gen);
@@ -445,7 +525,15 @@ bool ConcreteMap::findTile(char find, int& x, int& y){
 	}
 
 }
-bool ConcreteMap::removeMonster(int i){
+bool ConcreteMap::removeMonster(CharacterSprite* m){
+	for (int i = 0; i < monsters->size(); i++)
+	{
+		if (monsters->at(i) == m);
+		{
+			delete monsters->at(i);
+			monsters->erase(monsters->begin()+i); 
+		}
+	}
 	Notify();
 	return false;
 }

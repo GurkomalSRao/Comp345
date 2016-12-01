@@ -16,7 +16,7 @@ using namespace std;
 //! Implementation of a strategy for aggressive monsters
 class AggressiveStrategy : public SpriteStrategy {
 public:
-	int getStrategy(){
+	int getStrategyNumber(){
 		return 2;
 	}
 
@@ -27,7 +27,7 @@ public:
 	//! @param avatar: the player character
 	//! @param monsters: a list of monsters
 	//! @param function: the function to be performed to update the map
-	void execute(int speed, int attacks, CharacterSprite* me, CharacterSprite* avatar, vector<CharacterSprite*>* monsters,ConcreteMap* m) {
+	void execute(int speed, int attacks, CharacterSprite* me, CharacterSprite* avatar, vector<CharacterSprite*>* monsters, ConcreteMap* m, void(*log)(),bool logs[]) {
 		for (int i = 0; i < speed; i++)
 		{
 			if ((abs(me->pos.x - avatar->pos.x) == 1 && abs(me->pos.y - avatar->pos.y) == 0) || (abs(me->pos.x - avatar->pos.x) == 0 && abs(me->pos.y - avatar->pos.y) == 1))
@@ -45,14 +45,25 @@ public:
 				else
 					m->moveCharacter(Direction::right, me);
 			}
-			system("pause");
+			//system("pause");
+
 		}
+		NotifyGame("Player Turn Ended", logs);
 		for (int i = 0; i < attacks; i++)
 		{
 			if ((abs(me->pos.x - avatar->pos.x) == 1 && abs(me->pos.y - avatar->pos.y) == 0) || (abs(me->pos.x - avatar->pos.x) == 0 && abs(me->pos.y - avatar->pos.y) == 1))
 			{
-				me->attack(avatar);
-				cout << "The monster konks you in the head" << endl;
+				me->attack(avatar,i,logs);
+				if (avatar->c->getHitPoints() <= 0)
+				{
+					NotifyGame("Player was killed by " + me->c->getCharName(),logs);
+
+					cout << "You died!" << endl;
+					system("pause");
+					exit(0);
+				}
+
+				//cout << "The monster konks you in the head" << endl;
 			}
 		}
 		

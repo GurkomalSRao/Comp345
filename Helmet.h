@@ -32,9 +32,10 @@ public:
 	bool displayEquipedItems(string s);
 	Item* getItem(string s);
 	vector<Item*> getEquipment();
+	bool deaditem;//defines if Helmet is an empty item
 	~Helmet();
 private:
 	Item *it;
 	bool equiped;//validator to check if Helmet is already equipped
-	bool deaditem;//defines if Helmet is an empty item
+	
 };

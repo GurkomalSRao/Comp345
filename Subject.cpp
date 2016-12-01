@@ -19,3 +19,9 @@ void Subject::Notify(){
 		(*i)->Update();
 };
 
+void Subject::NotifyGame(string s, bool logs[4]){
+	list<Observer *>::iterator i = _observers->begin();
+	for (; i != _observers->end(); ++i)
+		(*i)->Update(s,logs);
+};
+

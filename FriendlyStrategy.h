@@ -14,7 +14,7 @@ class ConcreteMap;
 //! A strategy for friendly monsters
 class FriendlyStrategy : public SpriteStrategy {
 public:
-	int getStrategy(){
+	int getStrategyNumber(){
 		return 3;
 	}
 
@@ -25,7 +25,7 @@ public:
 	//! @param avatar: the player character
 	//! @param monsters: a list of monsters
 	//! @param function: the function to be performed to update the map
-	void execute(int speed, int attacks, CharacterSprite* me, CharacterSprite* avatar, vector<CharacterSprite*>* monsters, ConcreteMap* m) {
+	void execute(int speed, int attacks, CharacterSprite* me, CharacterSprite* avatar, vector<CharacterSprite*>* monsters, ConcreteMap* m, void(*log)(), bool logs[]) {
 		for (int i = 0; i < speed; i++)
 		{
 			if ((abs(me->pos.x - avatar->pos.x) == 1 && abs(me->pos.y - avatar->pos.y) == 0) || (abs(me->pos.x - avatar->pos.x) == 0 && abs(me->pos.y - avatar->pos.y) == 1))
@@ -43,11 +43,12 @@ public:
 				else
 					m->moveCharacter(Direction::right, me);
 			}
-			system("pause");
+			//system("pause");
 			
 
 			
 		}
+		NotifyGame("Player turn Ended ", logs);
 		random_device rd;
 		mt19937 gen(rd());  
 		uniform_int_distribution<> dis(0, 7);  

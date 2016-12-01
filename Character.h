@@ -16,17 +16,22 @@ class Character:  public AbstractCharacter
 {
 public:
 	Character();
+	Character(bool b);
 	Character(int, int, int, int, int, int);
+	Character(Dice*);
 	bool validateNewCharacter();
 	void hit(int);
+	int getBonusAttacks();
 	int getHitPoints();
 	void setHitPoints(int);
 	int abilityScore();
 	int abilityModifier(int);
 	void modifyHP();
+	Dice* getDice();
 	void setLevel(int);
+	void setCharacterLevel(int);
 	int armor();
-	int* attackBonus();
+	int attackBonus();
 	int damageBonus();
 	bool equipItem(string);
 	bool unequipItem(Item*);
@@ -39,6 +44,7 @@ public:
 	//void loadCharacter();
 	const Item noItem;
 	void monsterClass();
+	
 	ItemContainer getBackPack();
 	void setAbilityScore(int, int);
 	void setAbilityScores(string);
@@ -58,6 +64,12 @@ public:
 	void setBonusDamage();
 	void initializeBonusAttack();
 	int getBonusAtks(int);
+	void setDice(Dice*);
+	void SetBonusAttacks(int);
+	int getAccuracy(int);
+	int getDamage();
+	void setCharName(string);
+	string getCharName();
 private: 
 	string characterClass;
 	ItemContainer backpack;
@@ -66,13 +78,14 @@ private:
 	int abilityScores[6];
 	int currentHitPoints;
 	int level;
-	int* attacks;
-	int* totalDamagePerRound = new int(1);
-	int length;
-	int baseBonusAtk;
+	string charName;
+	//int* attacks;
+	//int* totalDamagePerRound = new int(1);
+	//int length;
+	//int baseBonusAtk;
 	string fighterType;
-	Dice dice;
-	int armorClass;
-	int bonusDamage;
+	Dice* dice;
+	//int armorClass;
+	//int bonusDamage;
 };
 
